@@ -36,9 +36,9 @@ contests = {
 }
 '''
 
-contests = {}
+contests = dict()
 names_set = set()
-total = {}
+total = dict()
 
 
 def get_first(obj, tag, class_):
@@ -71,6 +71,8 @@ def srt_compare(x, y):
 
 
 def parse_contest(contest_id):
+    print 'parsing', contest_id
+
     url = 'http://contest.stavpoisk.ru/olympiad/{0}/show-monitor'.format(contest_id)
     response = requests.get(url)
     soup = Bs(response.text)
@@ -168,7 +170,7 @@ def calculate():
                 total[name]['se'] += get_pts(task['text'])
 
 
-def generate():
+def generate(table_name):
     out = Bs(open('test.html').read())
     root = out.html.table
     head_row = root.thead
@@ -241,14 +243,20 @@ def generate():
                         tmp.string = text
                         cur_row.append(tmp)
 
-    with open('stand.html', 'w') as f:
+    with open(table_name, 'w') as f:
         f.write(out.prettify().encode('utf-8'))
 
+def create_table(name, ids):
+    contests.clear()
+    names_set.clear()
+    total.clear()
+    for id in ids:
+        parse_contest(id)
+    calculate()
+    generate(name)
 
 if __name__ == '__main__':
     par_c = [25, 27, 29, 32, 38, 39, 40, 43, 47, 48, 50]
-    par_d = []
-    for i in par_c:
-        parse_contest(i)
-    calculate()
-    generate()
+    par_d = [31, 33, 34, 35, 36, 41, 42, 44, 46, 49, 51]
+    create_table('stand-c.html', par_c)
+    create_table('stand-d.html', par_d)
