@@ -49,7 +49,9 @@ def get_first(obj, tag, class_):
 def get_pts(s):
     s = s.strip()
     if len(s) > 1:
-        return abs(int(s))
+        x = int(s)
+        if x > 0:
+            return x
     return 0
 
 
@@ -259,14 +261,14 @@ def create_table(name, ids):
 
 
 def download_pages():
-    par_c = [25, 27, 29, 32, 38, 39, 40, 43, 47, 48, 50]
-    par_d = [31, 33, 34, 35, 36, 41, 42, 44, 46, 49, 51]
+    par_c = [25, 27, 29, 32, 38, 39, 40, 43, 47, 48, 50, 52]
+    par_d = [31, 33, 34, 35, 36, 41, 42, 44, 46, 49, 51, 53]
     for x in par_c:
         url = 'http://contest.stavpoisk.ru/olympiad/{0}/show-monitor'.format(x)
-        os.system('wget {} -O pages/{}.html'.format(url, x))
+        os.system('wget {} -nv -O pages/{}.html'.format(url, x))
     for x in par_d:
         url = 'http://contest.stavpoisk.ru/olympiad/{0}/show-monitor'.format(x)
-        os.system('wget {} -O pages/{}.html'.format(url, x))
+        os.system('wget {} -nv -O pages/{}.html'.format(url, x))
     create_table('stand-c.html', par_c)
     create_table('stand-d.html', par_d)
 
