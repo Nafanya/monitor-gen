@@ -1,7 +1,13 @@
 __author__ = 'nafanya'
 
+# creates tables using `requests` module to load pages
+
+import os
 import requests
 from bs4 import BeautifulSoup as Bs
+
+TEMPLATE = 'template.html'
+OUTPUT = 'out/'
 
 '''
 contests = {
@@ -48,7 +54,9 @@ def get_first(obj, tag, class_):
 def get_pts(s):
     s = s.strip()
     if len(s) > 1:
-        return abs(int(s))
+        x = int(s)
+        if x > 0:
+            return x
     return 0
 
 
@@ -171,7 +179,7 @@ def calculate():
 
 
 def generate(table_name):
-    out = Bs(open('test.html').read())
+    out = Bs(open(TEMPLATE).read())
     root = out.html.table
     head_row = root.thead
     body = root.tbody
@@ -243,7 +251,7 @@ def generate(table_name):
                         tmp.string = text
                         cur_row.append(tmp)
 
-    with open(table_name, 'w') as f:
+    with open(OUTPUT + table_name, 'w') as f:
         f.write(out.prettify().encode('utf-8'))
 
 def create_table(name, ids):
@@ -251,12 +259,29 @@ def create_table(name, ids):
     names_set.clear()
     total.clear()
     for id in ids:
-        parse_contest(id)
+        # seems to fail only if monitor is empty (in 
+        try:
+            parse_contest(id)
+        except:
+            pass
     calculate()
     generate(name)
+    
+def check_dirs():
+    try:
+        os.chdir('pages')
+        os.chdir(os.pardir)
+    except:
+        os.mkdir('pages')
+    try:
+        os.chdir('out')
+        os.chdir(os.pardir)
+    except:
+        os.mkdir('out')
 
 if __name__ == '__main__':
-    par_c = [25, 27, 29, 32, 38, 39, 40, 43, 47, 48, 50]
-    par_d = [31, 33, 34, 35, 36, 41, 42, 44, 46, 49, 51]
+    check_dirs()
+    par_c = [25, 27, 29, 32, 38, 39, 40, 43, 47, 48, 50, 52]
+    par_d = [31, 33, 34, 35, 36, 41, 42, 44, 46, 49, 51, 53, 54]
     create_table('stand-c.html', par_c)
     create_table('stand-d.html', par_d)

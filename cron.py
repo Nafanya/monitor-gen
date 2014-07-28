@@ -1,7 +1,8 @@
 __author__ = 'nafanya'
 
+# creates tables using os's `wget` to load pages
+
 import os
-import requests
 from bs4 import BeautifulSoup as Bs
 
 '''
@@ -175,7 +176,7 @@ def calculate():
 
 
 def generate(table_name):
-    out = Bs(open('test.html').read())
+    out = Bs(open('template.html').read())
     root = out.html.table
     head_row = root.thead
     body = root.tbody
@@ -247,30 +248,28 @@ def generate(table_name):
                         tmp.string = text
                         cur_row.append(tmp)
 
-    with open(table_name, 'w') as f:
+    with open('out/' + table_name, 'w') as f:
         f.write(out.prettify().encode('utf-8'))
 
 def create_table(name, ids):
     contests.clear()
     names_set.clear()
     total.clear()
+    for x in ids:
+        url = 'http://contest.stavpoisk.ru/olympiad/{0}/show-monitor'.format(x)
+        os.system('wget {} -nv -O pages/{}.html'.format(url, x))
     for id in ids:
-        parse_contest(id)
+        # seems to fail only if monitor is empty
+        try:
+            parse_contest(id)
+        except:
+            pass
     calculate()
     generate(name)
 
 
-def download_pages():
+if __name__ == '__main__':
     par_c = [25, 27, 29, 32, 38, 39, 40, 43, 47, 48, 50, 52]
-    par_d = [31, 33, 34, 35, 36, 41, 42, 44, 46, 49, 51, 53]
-    for x in par_c:
-        url = 'http://contest.stavpoisk.ru/olympiad/{0}/show-monitor'.format(x)
-        os.system('wget {} -nv -O pages/{}.html'.format(url, x))
-    for x in par_d:
-        url = 'http://contest.stavpoisk.ru/olympiad/{0}/show-monitor'.format(x)
-        os.system('wget {} -nv -O pages/{}.html'.format(url, x))
+    par_d = [31, 33, 34, 35, 36, 41, 42, 44, 46, 49, 51, 53, 54]
     create_table('stand-c.html', par_c)
     create_table('stand-d.html', par_d)
-
-if __name__ == '__main__':
-    download_pages()
